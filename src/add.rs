@@ -1,18 +1,18 @@
-use super::implementation::{Implementation, RunAgain, WasmImplementation};
+use super::implementation::{Implementation, WasmImplementation};
 use serde_json;
 use serde_json::Value;
 
 pub struct Add;
 
 impl WasmImplementation for Add {
-    fn run_wasm(&self, input_data: Vec<u8>) -> (Vec<u8>, RunAgain) {
+    fn run_wasm(&self, input_data: Vec<u8>) -> Vec<u8> {
         let inputs: Vec<Vec<Value>> = serde_json::from_slice(input_data.as_slice()).unwrap();
 
         let (result, run_again) = self.run(inputs);
 
-        let result_data = serde_json::to_vec(&result).unwrap();
+        let result_data = serde_json::to_vec(&(result, run_again)).unwrap();
 
-        (result_data, run_again)
+        result_data
     }
 }
 
