@@ -7,10 +7,11 @@ mod wrapper;
 
 use implementation::Implementation;
 use crate::wrapper::Wrapper;
+use add::Add;
 
 fn main() {
     let inputs = vec!(vec!(json!(1)), vec!(json!(2)));
-    let implementation = &Wrapper{} as &Implementation;
+    let implementation = &Wrapper{implementation: &Add{}} as &Implementation;
 
     let (result, run_again) = implementation.run(inputs);
 

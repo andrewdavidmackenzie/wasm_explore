@@ -10,6 +10,6 @@ pub trait Implementation : RefUnwindSafe + UnwindSafe + Sync + Send {
     fn run(&self, inputs: Vec<Vec<Value>>) -> (Option<Value>, RunAgain);
 }
 
-pub trait WasmImplementation {
+pub trait WasmImplementation: RefUnwindSafe + UnwindSafe + Sync + Send {
     fn run(&self, input_data: Vec<u8>) -> (Vec<u8>, RunAgain);
 }
