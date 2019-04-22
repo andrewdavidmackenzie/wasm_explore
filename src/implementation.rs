@@ -11,5 +11,5 @@ pub trait Implementation : RefUnwindSafe + UnwindSafe + Sync + Send {
 }
 
 pub trait WasmImplementation: RefUnwindSafe + UnwindSafe + Sync + Send {
-    fn run(&self, input_data: Vec<u8>) -> (Vec<u8>, RunAgain);
+    fn run_wasm(&self, input_data: Vec<u8>) -> (Vec<u8>, RunAgain);
 }

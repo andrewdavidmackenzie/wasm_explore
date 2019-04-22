@@ -10,7 +10,7 @@ impl<'a> Implementation for Wrapper<'a> {
     fn run(&self, inputs: Vec<Vec<Value>>) -> (Option<Value>, bool) {
         let input_data = serde_json::to_vec(&inputs).unwrap();
 
-        let (result_data, run_again) = self.implementation.run(input_data);
+        let (result_data, run_again) = self.implementation.run_wasm(input_data);
 
         let result = serde_json::from_slice(&result_data).unwrap();
 

@@ -4,13 +4,11 @@ use serde_json::Value;
 
 pub struct Add;
 
-const IMPLEMENTATION: &Implementation = & Add{} as &Implementation;
-
 impl WasmImplementation for Add {
-    fn run(&self, input_data: Vec<u8>) -> (Vec<u8>, RunAgain) {
+    fn run_wasm(&self, input_data: Vec<u8>) -> (Vec<u8>, RunAgain) {
         let inputs: Vec<Vec<Value>> = serde_json::from_slice(input_data.as_slice()).unwrap();
 
-        let (result, run_again) = IMPLEMENTATION.run(inputs);
+        let (result, run_again) = self.run(inputs);
 
         let result_data = serde_json::to_vec(&result).unwrap();
 
