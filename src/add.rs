@@ -1,18 +1,25 @@
 use super::implementation::{Implementation, WasmImplementation};
 use serde_json;
 use serde_json::Value;
+use crate::wrapper;
 
 pub struct Add;
 
+// TODO generate this from a macro to wrap native code?
+// TODO that is only generated when the target is wasm?
+// TODO renames the real implementation or adds a new wrapper one?
 impl WasmImplementation for Add {
-    fn run_wasm(&self, input_data: Vec<u8>) -> Vec<u8> {
-        let inputs: Vec<Vec<Value>> = serde_json::from_slice(input_data.as_slice()).unwrap();
+    fn run_wasm(&self, size: u32) -> usize {
+        let input_slice = wrapper::get_module_memory(size);
+        let inputs: Vec<Vec<Value>> = serde_json::from_slice(input_slice).unwrap();
 
         let (result, run_again) = self.run(inputs);
 
         let result_data = serde_json::to_vec(&(result, run_again)).unwrap();
+        let result_data_size = result_data.len();
+        wrapper::set_module_memory(result_data.as_slice());
 
-        result_data
+        result_data_size
     }
 }
 
