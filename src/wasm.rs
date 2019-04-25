@@ -1,4 +1,4 @@
-use std::sync::{Arc, Mutex};
+use std::sync::Mutex;
 
 use crate::implementation::Implementation;
 use crate::implementation::RunAgain;
@@ -9,7 +9,7 @@ use wasmi::{Module, ModuleRef, ModuleInstance, ImportsBuilder};
 use serde_json;
 
 pub struct WasmExecutor {
-    pub module: Arc<Mutex<ModuleRef>>,
+    pub module: Mutex<ModuleRef>,
     function_name: String,
 }
 
@@ -37,7 +37,7 @@ impl Implementation for WasmExecutor {
 /*
     load a Wasm module from the specified Url.
 */
-pub fn load(function_name: &str, content: Vec<u8>) -> Arc<WasmExecutor> {
+pub fn load(function_name: &str, content: Vec<u8>) -> WasmExecutor {
     let module = Module::from_buffer(content).unwrap();
 
     let module_ref = ModuleInstance::new(&module, &ImportsBuilder::default())
@@ -45,9 +45,9 @@ pub fn load(function_name: &str, content: Vec<u8>) -> Arc<WasmExecutor> {
         .assert_no_start();
 
     let executor = WasmExecutor {
-        module: Arc::new(Mutex::new(module_ref.clone())),
-        function_name: function_name.to_string()
+        module: Mutex::new(module_ref.clone()),
+        function_name: function_name.to_string(),
     };
 
-    Arc::new(executor)
+    executor
 }

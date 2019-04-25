@@ -1,7 +1,7 @@
 use super::implementation::{Implementation, WasmImplementation};
 use serde_json;
 use serde_json::Value;
-use crate::wrapper;
+use crate::simulator;
 
 pub struct Add;
 
@@ -10,14 +10,14 @@ pub struct Add;
 // TODO renames the real implementation or adds a new wrapper one?
 impl WasmImplementation for Add {
     fn run_wasm(&self, size: u32) -> usize {
-        let input_slice = wrapper::get_module_memory(size);
+        let input_slice = simulator::get_module_memory(size);
         let inputs: Vec<Vec<Value>> = serde_json::from_slice(input_slice).unwrap();
 
         let (result, run_again) = self.run(inputs);
 
         let result_data = serde_json::to_vec(&(result, run_again)).unwrap();
         let result_data_size = result_data.len();
-        wrapper::set_module_memory(result_data.as_slice());
+        simulator::set_module_memory(result_data.as_slice());
 
         result_data_size
     }
