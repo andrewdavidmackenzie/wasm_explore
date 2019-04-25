@@ -14,7 +14,6 @@ pub struct WasmExecutor {
 
 impl Implementation for WasmExecutor {
     fn run(&self, inputs: Vec<Vec<Value>>) -> (Option<Value>, RunAgain) {
-
         // setup module memory with the serialized version of inputs Vec<Vec<Value>>
         let linear_memory = MemoryInstance::alloc(Pages(1), None).unwrap();
         let input_data = serde_json::to_vec(&inputs).unwrap();

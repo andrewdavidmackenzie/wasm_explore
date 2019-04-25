@@ -20,7 +20,7 @@ fn main() {
     let (result, run_again) = implementation.run(inputs.clone());
     println!("Simulator\nResult = {}, run_again = {}", result.unwrap(), run_again);
 
-    let filename = "add.wasm";
+    let filename = "add_memory.wasm";
     let mut buffer = Vec::new();
     let mut file = File::open(filename).unwrap();
     file.read_to_end(&mut buffer).unwrap();
