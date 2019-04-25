@@ -3,8 +3,7 @@ use std::sync::Mutex;
 use crate::implementation::Implementation;
 use crate::implementation::RunAgain;
 use serde_json::Value;
-use wasmi::{Module, ModuleRef, ModuleInstance, ImportsBuilder};
-//use wasmi::{Module, ModuleRef, ModuleInstance, ImportsBuilder, RuntimeValue, NopExternals};
+use wasmi::{Module, ModuleRef, ModuleInstance, ImportsBuilder, RuntimeValue, NopExternals};
 
 use serde_json;
 
@@ -14,23 +13,43 @@ pub struct WasmExecutor {
 }
 
 impl Implementation for WasmExecutor {
-    fn run(&self, _inputs: Vec<Vec<Value>>) -> (Option<Value>, RunAgain) {
-        println!("Wasm implementation wrapper for function '{}' called", self.function_name);
+    fn run(&self, inputs: Vec<Vec<Value>>) -> (Option<Value>, RunAgain) {
+        println!("WasmExecutor for function '{}' called", self.function_name);
 
         // TODO setup module memory
         // TODO call the wasm implementation function (by name?) and get the result
         // TODO read the module memory and reconstruct the return tuple
 
-        /*
-          A wasm module is invoked thus:
-            pub fn invoke_export<E: Externals>(&self, func_name: &str, args: &[RuntimeValue],
-                                    externals: &mut E) -> Result<Option<RuntimeValue>, Error>
+        let input_a = inputs.get(0).unwrap().get(0).unwrap().as_u64().unwrap() as u32;
+        let input_b = inputs.get(1).unwrap().get(0).unwrap().as_u64().unwrap() as u32;
 
-        let res = module.invoke_export(self.function_name, &[RuntimeValue::from(inputs)],
-                                  &mut NopExternals).unwrap().unwrap();
-        res
-        */
-        (Some(json!(42)), true)
+        let mut args = Vec::<RuntimeValue>::new();
+        args.push(RuntimeValue::from(input_a));
+        args.push(RuntimeValue::from(input_b));
+
+        let module = self.module.lock().unwrap();
+        let result = module.invoke_export(&self.function_name,
+                                       &args, &mut NopExternals);
+
+        match result {
+            Ok(value) => {
+                match value {
+                    Some(RuntimeValue::I32(sum)) => (Some(json!(sum)), true),
+                    Some(_) => {
+                        println!("Got a value of an unexpected type");
+                        (None, true)
+                    }
+                    None => {
+                        println!("Failed to get a result from wasm invocation");
+                        (None, true)
+                    }
+                }
+            }
+            Err(err) => {
+                println!("Error returned by Wasm invoke_export(): {:?}", err);
+                (None, true)
+            }
+        }
     }
 }
 
@@ -45,7 +64,7 @@ pub fn load(function_name: &str, content: Vec<u8>) -> WasmExecutor {
         .assert_no_start();
 
     let executor = WasmExecutor {
-        module: Mutex::new(module_ref.clone()),
+        module: Mutex::new(module_ref),
         function_name: function_name.to_string(),
     };
 

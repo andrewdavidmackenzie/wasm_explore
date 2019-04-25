@@ -26,5 +26,9 @@ fn main() {
     let wasm_executor = wasm::load("add", buffer);
 
     let (result, run_again) = wasm_executor.run(inputs);
-    println!("esult = {}, run_again = {}", result.unwrap(), run_again);
+
+    match result {
+        Some(res) => println!("Result = {}, run_again = {}", res, run_again),
+        _ => {}
+    }
 }
