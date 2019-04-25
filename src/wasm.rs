@@ -3,23 +3,29 @@ use std::sync::Mutex;
 use crate::implementation::Implementation;
 use crate::implementation::RunAgain;
 use serde_json::Value;
-use wasmi::{Module, ModuleRef, ModuleInstance, ImportsBuilder, RuntimeValue, NopExternals};
+use wasmi::{Module, ModuleRef, ModuleInstance, ImportsBuilder, RuntimeValue, NopExternals, MemoryInstance};
+use wasmi::memory_units::*;
 
 use serde_json;
 
 pub struct WasmExecutor {
-    pub module: Mutex<ModuleRef>,
-    function_name: String,
+    pub module: Mutex<ModuleRef>
 }
 
 impl Implementation for WasmExecutor {
     fn run(&self, inputs: Vec<Vec<Value>>) -> (Option<Value>, RunAgain) {
-        println!("WasmExecutor for function '{}' called", self.function_name);
 
-        // TODO setup module memory
-        // TODO call the wasm implementation function (by name?) and get the result
-        // TODO read the module memory and reconstruct the return tuple
+        // setup module memory with the serialized version of inputs Vec<Vec<Value>>
+        let linear_memory = MemoryInstance::alloc(Pages(1), None).unwrap();
+        let input_data = serde_json::to_vec(&inputs).unwrap();
+        linear_memory.set(0, input_data.as_slice()).unwrap();
+        println!("Allocated Memory and set to serialized input values");
+        // let input_value = input_date.len();
+        //let mut args = Vec::<RuntimeValue>::new();
+        // args.push(RuntimeValue::from(input_value));
 
+
+        // passing the actual values as two i32 - not Vec<Vec<Value>>
         let input_a = inputs.get(0).unwrap().get(0).unwrap().as_u64().unwrap() as u32;
         let input_b = inputs.get(1).unwrap().get(0).unwrap().as_u64().unwrap() as u32;
 
@@ -27,14 +33,26 @@ impl Implementation for WasmExecutor {
         args.push(RuntimeValue::from(input_a));
         args.push(RuntimeValue::from(input_b));
 
-        let module = self.module.lock().unwrap();
-        let result = module.invoke_export(&self.function_name,
+
+
+        // call the wasm implementation function (by name)
+        let module_ref = self.module.lock().unwrap();
+        let result = module_ref.invoke_export("add",
                                        &args, &mut NopExternals);
 
         match result {
             Ok(value) => {
                 match value {
-                    Some(RuntimeValue::I32(sum)) => (Some(json!(sum)), true),
+                    Some(RuntimeValue::I32(sum)) => {
+                        // read the module memory and reconstruct the return tuple
+                        /*
+                        let ret_value: i32 = 0; // TODO when wasm returns the size of the serialized return tuple
+                        let result_data = linear_memory.get(0, result_date_size).unwrap().as_slice();
+                        let (result, run_again) = serde_json::from_slice(result_data).unwrap();
+                        */
+
+                        (Some(json!(sum)), true)
+                    },
                     Some(_) => {
                         println!("Got a value of an unexpected type");
                         (None, true)
@@ -56,7 +74,7 @@ impl Implementation for WasmExecutor {
 /*
     load a Wasm module from the specified Url.
 */
-pub fn load(function_name: &str, content: Vec<u8>) -> WasmExecutor {
+pub fn load(content: Vec<u8>) -> WasmExecutor {
     let module = Module::from_buffer(content).unwrap();
 
     let module_ref = ModuleInstance::new(&module, &ImportsBuilder::default())
@@ -64,8 +82,7 @@ pub fn load(function_name: &str, content: Vec<u8>) -> WasmExecutor {
         .assert_no_start();
 
     let executor = WasmExecutor {
-        module: Mutex::new(module_ref),
-        function_name: function_name.to_string(),
+        module: Mutex::new(module_ref)
     };
 
     executor

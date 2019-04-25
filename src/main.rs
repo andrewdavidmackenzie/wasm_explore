@@ -1,6 +1,8 @@
 #[macro_use]
 extern crate serde_json;
 
+extern crate memory_units;
+
 mod add;
 mod implementation;
 mod simulator;
@@ -23,7 +25,7 @@ fn main() {
     let mut file = File::open(filename).unwrap();
     file.read_to_end(&mut buffer).unwrap();
     println!("\nWASM\nLoading wasm module from '{}'", filename);
-    let wasm_executor = wasm::load("add", buffer);
+    let wasm_executor = wasm::load(buffer);
 
     let (result, run_again) = wasm_executor.run(inputs);
 
