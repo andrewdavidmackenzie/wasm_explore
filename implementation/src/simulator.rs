@@ -1,6 +1,6 @@
-use super::implementation::Implementation;
+use implementation::Implementation;
+use implementation::WasmImplementation;
 use serde_json::Value;
-use crate::implementation::WasmImplementation;
 use std::slice;
 
 pub struct Wrapper<'a> {

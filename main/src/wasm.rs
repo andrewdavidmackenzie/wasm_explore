@@ -1,7 +1,8 @@
 use std::sync::Mutex;
 
-use crate::implementation::Implementation;
-use crate::implementation::RunAgain;
+extern crate implementation;
+use implementation::implementation::Implementation;
+use implementation::implementation::RunAgain;
 use serde_json::Value;
 use wasmi::{Module, ModuleRef, ModuleInstance, ImportsBuilder, RuntimeValue, NopExternals, MemoryInstance};
 use wasmi::memory_units::*;

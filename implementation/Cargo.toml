@@ -1,0 +1,10 @@
+[package]
+name = "implementation"
+version = "0.0.1"
+
+[lib]
+name = "implementation"
+path = "src/lib.rs"
+
+[dependencies]
+serde_json = "1.0"

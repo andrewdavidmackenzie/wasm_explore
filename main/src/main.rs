@@ -1,15 +1,12 @@
 #[macro_use]
 extern crate serde_json;
-
 extern crate memory_units;
 
-mod add;
-mod implementation;
-mod simulator;
 mod wasm;
 
-use implementation::Implementation;
-use crate::simulator::Wrapper;
+extern crate implementation;
+use implementation::implementation::Implementation;
+use implementation::simulator::Wrapper;
 use add::Add;
 use std::fs::File;
 use std::io::Read;

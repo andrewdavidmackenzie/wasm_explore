@@ -1,7 +1,10 @@
-use super::implementation::{Implementation, WasmImplementation};
-use serde_json;
+extern crate implementation;
+use implementation::implementation::{Implementation, WasmImplementation};
+use implementation::simulator;
+
+#[macro_use]
+extern crate serde_json;
 use serde_json::Value;
-use crate::simulator;
 
 pub struct Add;
 
