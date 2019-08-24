@@ -17,6 +17,12 @@ fn main() {
     println!("Running in {}", std::env::current_dir().unwrap().display());
     let inputs = vec!(vec!(json!(1)), vec!(json!(2)));
 
+    // Run the function usin gnative-native rust
+    let implementation = &Add{} as &dyn Implementation;
+    // Call the function
+    let (result, run_again) = implementation.run(inputs.clone());
+    println!("\nNative\n=========\nResult = {}, run_again = {}", result.unwrap(), run_again);
+
     // Create a Simulated wasm executor
     let implementation = &WasmSimulator::new(&Add{}) as &dyn Implementation;
     // Call the function via the wasm simulator
