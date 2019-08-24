@@ -4,7 +4,7 @@ use serde_json::Value;
 use std::slice;
 
 pub struct Wrapper<'a> {
-    pub implementation: &'a WasmImplementation
+    pub implementation: &'a dyn WasmImplementation
 }
 
 static mut MEMORY: [u8; 1000] = [0; 1000];

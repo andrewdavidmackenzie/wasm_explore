@@ -1,0 +1,12 @@
+[package]
+name = "add"
+version = "0.0.1"
+
+[lib]
+name = "add"
+crate-type = ["cdylib"]
+path = "src/add.rs"
+
+[dependencies]
+implementation = { path = "../implementation", version = "*" }
+serde_json = "1.0"
