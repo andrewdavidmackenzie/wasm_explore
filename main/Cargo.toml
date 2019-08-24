@@ -6,7 +6,7 @@ edition = "2018"
 
 [dependencies]
 implementation = { path = "../implementation", version = "*" }
-add = { path = "../add", version = "*" }
+add = { path = "../rust_add", version = "*" }
 wrapper = { path = "../wrapper", version = "*" }
 
 serde = "~1.0.27"
