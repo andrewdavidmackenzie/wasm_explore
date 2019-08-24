@@ -1,0 +1,13 @@
+[package]
+name = "wrapper"
+version = "0.0.1"
+
+[lib]
+name = "wrapper"
+path = "src/lib.rs"
+
+[dependencies]
+serde_json = "1.0"
+add = { path = "../add"}
+implementation = { path = "../implementation"}
+wasmi = "=0.4.2"
