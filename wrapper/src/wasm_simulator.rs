@@ -1,11 +1,9 @@
-extern crate add;
-extern crate implementation;
-extern crate serde_json;
+
 
 use std::slice;
 
-use self::implementation::{Implementation, RunAgain};
-use self::serde_json::Value;
+use implementation::{Implementation, RunAgain};
+use serde_json::Value;
 
 pub struct WasmSimulator<'a> {
     wrapper: Wrapper<'a>

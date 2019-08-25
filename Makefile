@@ -1,21 +1,15 @@
-all: hand_crafted/add.wasm hand_crafted/add_memory.wasm wasm run
+all: wasm run
 
 clean:
 	cargo clean
 
-hand_crafted/%.wasm: hand_crafted/%.wat
-	wat2wasm $<
+%.wat : %.wasm
+	wasm2wat $<
 
-wasm: rust_add
-	# Compile rust to wasm using specific Cargo.toml for the purpose
-	cp rust_add/Cargo_wasm.toml rust_add/Cargo.toml
-	cd rust_add; cargo build --manifest-path=Cargo.toml --target=wasm32-unknown-unknown
-	# Copy compiled wasm file into the root folder
-	cp rust_add/target/wasm32-unknown-unknown/debug/add.wasm rust_add/add.wasm
-	#restore native build Cargo.toml for main build to use
-	cp rust_add/Cargo_native.toml rust_add/Cargo.toml
+wasm:
+	cargo build --manifest-path=add_function/Cargo.toml
 	# decompile so we can look at the code
-	wasm2wat rust_add/target/wasm32-unknown-unknown/debug/add.wasm -o rust_add/add.wat
+	wasm2wat add_function/target/wasm32-unknown-unknown/debug/add_function.wasm -o add_function/add_function.wat
 
 run:
 	cargo run

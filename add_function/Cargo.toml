@@ -1,0 +1,12 @@
+[package]
+name = "add_function"
+version = "0.0.1"
+
+[lib]
+name = "add_function"
+crate-type = ["cdylib"]
+path = "src/add_function.rs"
+
+[dependencies]
+implementation = { path = "../implementation"}
+serde_json = "1.0"

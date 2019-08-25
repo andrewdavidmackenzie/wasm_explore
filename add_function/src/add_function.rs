@@ -10,7 +10,7 @@ use serde_json::Value;
 pub struct Add;
 
 impl Implementation for Add {
-    // TODO rust_add the macro here that wraps this function
+    // TODO add_function the macro here that wraps this function
     fn run(&self, inputs: Vec<Vec<Value>>) -> (Option<Value>, bool) {
         let input_a = inputs.get(0).unwrap().get(0).unwrap();
         let input_b = inputs.get(1).unwrap().get(0).unwrap();
@@ -18,5 +18,11 @@ impl Implementation for Add {
         let value = Some(json!(input_a.as_i64().unwrap() + input_b.as_i64().unwrap()));
 
         (value, true)
+    }
+}
+
+impl Add {
+    fn add(a: u32, b: u32) -> u32 {
+        a + b
     }
 }

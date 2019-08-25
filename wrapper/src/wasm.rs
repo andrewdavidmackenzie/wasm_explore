@@ -1,13 +1,12 @@
-extern crate implementation;
-extern crate wasmi;
+
 
 use std::sync::Mutex;
 
 use serde_json::Value;
 
-use self::implementation::{Implementation, RunAgain};
-use self::wasmi::{MemoryInstance, ModuleRef, NopExternals, RuntimeValue};
-use self::wasmi::memory_units::*;
+use implementation::{Implementation, RunAgain};
+use wasmi::{MemoryInstance, ModuleRef, NopExternals, RuntimeValue};
+use wasmi::memory_units::*;
 
 pub struct WasmExecutor {
     module: Mutex<ModuleRef>,
@@ -35,7 +34,7 @@ impl Implementation for WasmExecutor {
         // args.push(RuntimeValue::from(input_value));
 
 
-        // passing the actual values as two i32 - not Vec<Vec<Value>>
+        // TODO passing the actual values as two i32 - not Vec<Vec<Value>>
         let input_a = inputs.get(0).unwrap().get(0).unwrap().as_u64().unwrap() as u32;
         let input_b = inputs.get(1).unwrap().get(0).unwrap().as_u64().unwrap() as u32;
 

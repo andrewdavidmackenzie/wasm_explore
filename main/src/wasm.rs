@@ -1,6 +1,3 @@
-extern crate implementation;
-extern crate wrapper;
-
 use wasmi::{ImportsBuilder, Module, ModuleInstance};
 
 use wrapper::wasm::WasmExecutor;
