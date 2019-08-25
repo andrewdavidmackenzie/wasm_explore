@@ -40,8 +40,8 @@ impl Implementation for WasmExecutor {
 
         // call the wasm implementation function (by name)
         let module_ref = self.module.lock().unwrap();
-        println!("Running the exported function 'add'");
-        let result = module_ref.invoke_export("add",
+        println!("Running the exported function 'run_wasm'");
+        let result = module_ref.invoke_export("run_wasm",
                                               &args, &mut NopExternals);
 
         match result {
