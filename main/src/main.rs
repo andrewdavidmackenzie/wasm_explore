@@ -3,6 +3,9 @@ extern crate memory_units;
 #[macro_use]
 extern crate serde_json;
 extern crate wrapper;
+extern crate rand;
+
+use rand::Rng;
 
 use serde_json::Value;
 use std::fs::File;
@@ -33,8 +36,13 @@ fn run_wasm(filename: &str, inputs: &Vec<Vec<Value>>, expected: &Value) {
 
 fn main() {
     println!("Running in {}", std::env::current_dir().unwrap().display());
-    let inputs = vec!(vec!(json!(3)), vec!(json!(2)));
-    let expected = json!(5);
+    let mut rng = rand::thread_rng();
+    let i1: u32 = rng.gen_range(0, 1000);
+    let i2: u32 = rng.gen_range(0, 1000);
+    let sum: u32 = i1 + i2;
+
+    let inputs = vec!(vec!(json!(i1)), vec!(json!(i2)));
+    let expected = json!(sum);
 
     println!("\nHandcrafted WASM\n===========");
     run_wasm("hand_crafted/add.wasm", &inputs, &expected);
