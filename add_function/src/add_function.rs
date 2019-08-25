@@ -5,6 +5,11 @@ use serde_json::Value;
 
 pub struct Add;
 
+#[no_mangle]
+pub extern "C" fn add(a: u32, b: u32) -> u32 {
+    a + b
+}
+
 impl Add {
     // TODO add_function the macro here that wraps this function
 #[no_mangle]
