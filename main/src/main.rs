@@ -13,14 +13,14 @@ use std::io::Read;
 
 use implementation::Implementation;
 
-mod wasm;
+mod loader;
 
 fn run_wasm(filename: &str, inputs: &Vec<Vec<Value>>, expected: &Value) {
     println!("Loading wasm module from '{}'", filename);
     let mut buffer = Vec::new();
     let mut file = File::open(filename).unwrap();
     file.read_to_end(&mut buffer).unwrap();
-    let wasm_executor = wasm::load(buffer);
+    let wasm_executor = loader::load(buffer);
 
     // Run the function
     let (result, run_again) = wasm_executor.run(inputs.clone());
