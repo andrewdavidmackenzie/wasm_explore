@@ -26,7 +26,6 @@ impl Implementation for WasmExecutor {
         let linear_memory = MemoryInstance::alloc(Pages(1), None).unwrap();
         let input_data = serde_json::to_vec(&inputs).unwrap();
         linear_memory.set(0, input_data.as_slice()).unwrap();
-        println!("Allocated Memory and set to serialized input values");
         // let input_value = input_date.len();
         //let mut args = Vec::<RuntimeValue>::new();
         // args.push(RuntimeValue::from(input_value));
@@ -41,6 +40,7 @@ impl Implementation for WasmExecutor {
 
         // call the wasm implementation function (by name)
         let module_ref = self.module.lock().unwrap();
+        println!("Running the exported function 'add'");
         let result = module_ref.invoke_export("add",
                                               &args, &mut NopExternals);
 
@@ -57,14 +57,7 @@ impl Implementation for WasmExecutor {
 
                         (Some(json!(sum)), true)
                     }
-                    Some(_) => {
-                        println!("Got a value of an unexpected type");
-                        (None, true)
-                    }
-                    None => {
-                        println!("Failed to get a result from wasm invocation");
-                        (None, true)
-                    }
+                    _ => (None, true)
                 }
             }
             Err(err) => {
