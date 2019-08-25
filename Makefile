@@ -1,7 +1,4 @@
-all: wasm wat run
-
-wasm:
-	@cd add_function; cargo build
+all: run wat
 
 wat:
 	@# decompile so we can look at the code

@@ -1,4 +1,3 @@
 [workspace]
-members = ["implementation", "main", "wrapper"]
+members = ["implementation", "main", "wrapper", "add_function"]
 default-members = ["main"]
-exclude = ["add_function"]
