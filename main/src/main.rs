@@ -44,8 +44,6 @@ fn main() {
     let inputs = vec!(vec!(json!(i1)), vec!(json!(i2)));
     let expected = json!(sum);
 
-    println!("\nHandcrafted WASM\n===========");
-    run_wasm("hand_crafted/add.wasm", &inputs, &expected);
     println!("\nRust compiled to WASM\n===========");
     run_wasm("add_function/target/wasm32-unknown-unknown/debug/add_function.wasm",
              &inputs, &expected);

@@ -8,8 +8,15 @@ use implementation::Implementation;
 
 pub struct Add;
 
+#[no_mangle]
+pub extern "C" fn add(a: u32, b: u32) -> u32 {
+    let inputs = vec!(vec!(json!(a)), vec!(json!(b)));
+    let adder = Add{};
+    let (value, _bool) = adder.run(inputs);
+    value.unwrap().as_u64().unwrap() as u32
+}
+
 impl Implementation for Add {
-    // TODO add_function the macro here that wraps this function
     fn run(&self, inputs: Vec<Vec<Value>>) -> (Option<Value>, bool) {
         let input_a = inputs.get(0).unwrap().get(0).unwrap();
         let input_b = inputs.get(1).unwrap().get(0).unwrap();
@@ -20,12 +27,6 @@ impl Implementation for Add {
     }
 }
 
+// TODO add_function the macro here that wraps this function
 impl Add {
-    #[no_mangle]
-    pub extern "C" fn add(a: u32, b: u32) -> u32 {
-        let inputs = vec!(vec!(json!(a)), vec!(json!(b)));
-        let adder = Add{};
-        let (value, _bool) = adder.run(inputs);
-        value.unwrap().as_u64().unwrap() as u32
-    }
 }
