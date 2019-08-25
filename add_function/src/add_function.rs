@@ -1,7 +1,3 @@
-extern crate implementation;
-
-use implementation::Implementation;
-
 #[macro_use]
 extern crate serde_json;
 
@@ -9,9 +5,10 @@ use serde_json::Value;
 
 pub struct Add;
 
-impl Implementation for Add {
+impl Add {
     // TODO add_function the macro here that wraps this function
-    fn run(&self, inputs: Vec<Vec<Value>>) -> (Option<Value>, bool) {
+#[no_mangle]
+    extern "C" fn run(&self, inputs: Vec<Vec<Value>>) -> (Option<Value>, bool) {
         let input_a = inputs.get(0).unwrap().get(0).unwrap();
         let input_b = inputs.get(1).unwrap().get(0).unwrap();
 
@@ -19,10 +16,9 @@ impl Implementation for Add {
 
         (value, true)
     }
-}
 
-impl Add {
-    fn add(a: u32, b: u32) -> u32 {
+#[no_mangle]
+    pub extern "C" fn add(a: u32, b: u32) -> u32 {
         a + b
     }
 }

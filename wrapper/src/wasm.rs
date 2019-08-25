@@ -9,15 +9,13 @@ use wasmi::{MemoryInstance, ModuleRef, NopExternals, RuntimeValue};
 use wasmi::memory_units::*;
 
 pub struct WasmExecutor {
-    module: Mutex<ModuleRef>,
-    function_name: String,
+    module: Mutex<ModuleRef>
 }
 
 impl WasmExecutor {
-    pub fn new(module_ref: ModuleRef, function_name: String) -> Self {
+    pub fn new(module_ref: ModuleRef) -> Self {
         WasmExecutor {
-            module: Mutex::new(module_ref),
-            function_name,
+            module: Mutex::new(module_ref)
         }
     }
 }
@@ -33,7 +31,6 @@ impl Implementation for WasmExecutor {
         //let mut args = Vec::<RuntimeValue>::new();
         // args.push(RuntimeValue::from(input_value));
 
-
         // TODO passing the actual values as two i32 - not Vec<Vec<Value>>
         let input_a = inputs.get(0).unwrap().get(0).unwrap().as_u64().unwrap() as u32;
         let input_b = inputs.get(1).unwrap().get(0).unwrap().as_u64().unwrap() as u32;
@@ -42,10 +39,9 @@ impl Implementation for WasmExecutor {
         args.push(RuntimeValue::from(input_a));
         args.push(RuntimeValue::from(input_b));
 
-
         // call the wasm implementation function (by name)
         let module_ref = self.module.lock().unwrap();
-        let result = module_ref.invoke_export(&self.function_name,
+        let result = module_ref.invoke_export("add",
                                               &args, &mut NopExternals);
 
         match result {
