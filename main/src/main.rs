@@ -47,6 +47,6 @@ fn main() {
     let expected = json!(sum);
 
     println!("\nRust compiled to WASM\n===========");
-    run_wasm("add_function/target/wasm32-unknown-unknown/debug/add_function.wasm",
+    run_wasm("build/target/wasm32-unknown-unknown/debug/build.wasm",
              &inputs, &expected);
 }

@@ -6,7 +6,6 @@ edition = "2018"
 
 [dependencies]
 implementation = { path = "../implementation" }
-add_function = { path = "../add_function" }
 wrapper = { path = "../wrapper" }
 
 serde = "~1.0.27"
