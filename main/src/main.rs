@@ -29,6 +29,7 @@ fn run_wasm(filename: &str, inputs: &Vec<Vec<Value>>, expected: &Value) {
         Some(res) => {
             assert_eq!(expected.clone(), res);
             assert!(run_again);
+            println!("Ran successfully and result as expected");
         },
         _ => assert!(false)
     }

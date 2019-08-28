@@ -13,7 +13,10 @@ git clone https://github.com/andrewdavidmackenzie/wasm_explore
 ```
 
 # Build and Run
-This first builds the wasm module (in /wasm folder) from rust code there.
+`cd` into the folder and run `make`
+
+This first builds the wasm module (in /add_function folder) from rust code there.
+
 Then it builds and runs the program (in /main folder) that runs the wasm module using
 WASMI.
 
