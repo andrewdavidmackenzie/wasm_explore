@@ -1,9 +1,11 @@
 use std::sync::Mutex;
-
+use std::cmp::max;
 use serde_json::Value;
 use wasmi::{ModuleRef, MemoryRef, NopExternals, RuntimeValue};
 
 use implementation::{Implementation, RunAgain};
+
+const MAX_RESULT_SIZE: i32 = 1024;
 
 pub struct WasmExecutor {
     module: Mutex<ModuleRef>,
@@ -21,12 +23,12 @@ impl WasmExecutor {
 
 
 /*
-    Allocate memory for a new null-terminated array of bytes inside the wasm module and copy
-    the array of bytes into it
+    Allocate memory for array of bytes inside the wasm module and copy the array of bytes into it
 */
 fn send_byte_array(instance: &ModuleRef, memory: &MemoryRef, bytes: &[u8]) -> u32 {
+    let alloc_size = max(bytes.len() as i32, MAX_RESULT_SIZE);
     let result = instance
-        .invoke_export("alloc", &[RuntimeValue::I32(bytes.len() as i32)],
+        .invoke_export("alloc", &[RuntimeValue::I32(alloc_size)],
                        &mut NopExternals);
 
     match result.unwrap().unwrap() {
@@ -63,9 +65,13 @@ impl Implementation for WasmExecutor {
             Ok(value) => {
                 match value.unwrap() {
                     RuntimeValue::I32(result_length) => {
-                        let result_data = memory_ref.get(input_data_wasm_ptr, result_length as usize).unwrap();
-                        let (result, run_again) = serde_json::from_slice(result_data.as_slice()).unwrap();
-                        (result, run_again)
+                        if result_length > MAX_RESULT_SIZE {
+                            (None, true)
+                        } else {
+                            let result_data = memory_ref.get(input_data_wasm_ptr, result_length as usize).unwrap();
+                            let (result, run_again) = serde_json::from_slice(result_data.as_slice()).unwrap();
+                            (result, run_again)
+                        }
                     }
                     _ =>  (None, true)
                 }
