@@ -1,3 +1,6 @@
-/target
+add_function/add_function.wat
+add_function/Cargo.lock
+Cargo.lock
+**/target
 **/*.rs.bk
 *.wasm
