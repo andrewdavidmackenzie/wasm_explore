@@ -4,8 +4,8 @@ run: add_function/target/wasm32-unknown-unknown/debug/add_function.wasm
 	@RUST_BACKTRACE=1 cargo run
 
 clean:
+	@cd add_function; cargo clean
 	@cargo clean
-	@rm -rf add_function/target
 	@rm -f add_function/add_function.wat
 
 add_function/add_function.wat: add_function/target/wasm32-unknown-unknown/debug/add_function.wasm
