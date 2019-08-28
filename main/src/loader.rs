@@ -12,5 +12,11 @@ pub fn load(content: Vec<u8>) -> WasmExecutor {
         .unwrap()
         .assert_no_start();
 
-    WasmExecutor::new(module_ref)
+    let memory = module_ref.export_by_name("memory")
+        .expect("`memory` export not found")
+        .as_memory()
+        .expect("export name `memory` is not of memory type")
+        .to_owned();
+
+    WasmExecutor::new(module_ref, memory)
 }

@@ -1,3 +1,4 @@
+extern crate core;
 extern crate implementation;
 #[macro_use]
 extern crate serde_json;
@@ -7,13 +8,37 @@ use serde_json::Value;
 use implementation::Implementation;
 
 pub struct Add;
+use std::mem;
+use std::os::raw::c_void;
+use std::ptr::copy;
+
+/*
+    Allocate a chunk of memory of `size` bytes in wasm module
+*/
+#[no_mangle]
+pub extern "C" fn alloc(size: usize) -> *mut c_void {
+    let mut buf = Vec::with_capacity(size);
+    let ptr = buf.as_mut_ptr();
+    mem::forget(buf);
+    return ptr as *mut c_void;
+}
 
 #[no_mangle]
-pub extern "C" fn run_wasm(a: u32, b: u32) -> u32 {
-    let inputs = vec!(vec!(json!(a)), vec!(json!(b)));
-    let adder = Add{};
-    let (value, _bool) = adder.run(inputs);
-    value.unwrap().as_u64().unwrap() as u32
+pub extern "C" fn run_wasm(input_data_ptr: *mut c_void, input_data_length: i32) -> i32 {
+    let input_data: Vec<u8> = unsafe {
+        Vec::from_raw_parts(input_data_ptr as *mut u8,
+                              input_data_length as usize, input_data_length as usize)
+    };
+
+    let inputs = serde_json::from_slice(&input_data).unwrap();
+    let adder = Add {};
+    let result = adder.run(inputs);
+
+    let return_data = serde_json::to_vec(&result).unwrap();
+
+    unsafe { copy(return_data.as_ptr(), input_data_ptr as *mut u8, return_data.len()); }
+
+    return_data.len() as i32
 }
 
 impl Implementation for Add {
@@ -25,8 +50,4 @@ impl Implementation for Add {
 
         (value, true)
     }
-}
-
-// TODO add_function the macro here that wraps this function
-impl Add {
 }

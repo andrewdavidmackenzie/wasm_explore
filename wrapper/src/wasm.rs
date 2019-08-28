@@ -1,63 +1,73 @@
-
-
 use std::sync::Mutex;
 
 use serde_json::Value;
+use wasmi::{ModuleRef, MemoryRef, NopExternals, RuntimeValue};
 
 use implementation::{Implementation, RunAgain};
-use wasmi::{MemoryInstance, ModuleRef, NopExternals, RuntimeValue};
-use wasmi::memory_units::*;
 
 pub struct WasmExecutor {
-    module: Mutex<ModuleRef>
+    module: Mutex<ModuleRef>,
+    memory: Mutex<MemoryRef>
 }
 
 impl WasmExecutor {
-    pub fn new(module_ref: ModuleRef) -> Self {
+    pub fn new(module_ref: ModuleRef, memory: MemoryRef) -> Self {
         WasmExecutor {
-            module: Mutex::new(module_ref)
+            module: Mutex::new(module_ref),
+            memory: Mutex::new(memory)
         }
+    }
+}
+
+
+/*
+    Allocate memory for a new null-terminated array of bytes inside the wasm module and copy
+    the array of bytes into it
+*/
+fn send_byte_array(instance: &ModuleRef, memory: &MemoryRef, bytes: &[u8]) -> u32 {
+    let result = instance
+        .invoke_export("alloc", &[RuntimeValue::I32(bytes.len() as i32)],
+                       &mut NopExternals);
+
+    match result.unwrap().unwrap() {
+        RuntimeValue::I32(pointer) => {
+            let len = bytes.len();
+            for i in 0..len {
+                memory.set_value((pointer + i as i32) as u32, bytes[i]).unwrap();
+            }
+            pointer as u32
+        }
+        _ => 0 as u32
     }
 }
 
 impl Implementation for WasmExecutor {
     fn run(&self, inputs: Vec<Vec<Value>>) -> (Option<Value>, RunAgain) {
-        // setup module memory with the serialized version of inputs Vec<Vec<Value>>
-        let linear_memory = MemoryInstance::alloc(Pages(1), None).unwrap();
-        let input_data = serde_json::to_vec(&inputs).unwrap();
-        linear_memory.set(0, input_data.as_slice()).unwrap();
-        // let input_value = input_date.len();
-        //let mut args = Vec::<RuntimeValue>::new();
-        // args.push(RuntimeValue::from(input_value));
-
-        // TODO passing the actual values as two i32 - not Vec<Vec<Value>>
-        let input_a = inputs.get(0).unwrap().get(0).unwrap().as_u64().unwrap() as u32;
-        let input_b = inputs.get(1).unwrap().get(0).unwrap().as_u64().unwrap() as u32;
-
-        let mut args = Vec::<RuntimeValue>::new();
-        args.push(RuntimeValue::from(input_a));
-        args.push(RuntimeValue::from(input_b));
-
         // call the wasm implementation function (by name)
         let module_ref = self.module.lock().unwrap();
+        let memory_ref = self.memory.lock().unwrap();
+
+        // setup module memory with the serde serialization of `inputs: Vec<Vec<Value>>`
+        let input_data = serde_json::to_vec(&inputs).unwrap();
+
+        // Allocate a string for the input data inside wasm module
+        let input_data_wasm_ptr = send_byte_array(&module_ref, &memory_ref, &input_data);
+
         println!("Running the exported function 'run_wasm'");
         let result = module_ref.invoke_export("run_wasm",
-                                              &args, &mut NopExternals);
+                                              &[RuntimeValue::I32(input_data_wasm_ptr as i32),
+                                                  RuntimeValue::I32(input_data.len() as i32),], &mut NopExternals);
+
 
         match result {
             Ok(value) => {
-                match value {
-                    Some(RuntimeValue::I32(sum)) => {
-                        // read the module memory and reconstruct the return tuple
-                        /*
-                        let ret_value: i32 = 0; // TODO when wasm returns the size of the serialized return tuple
-                        let result_data = linear_memory.get(0, result_date_size).unwrap().as_slice();
-                        let (result, run_again) = serde_json::from_slice(result_data).unwrap();
-                        */
-
-                        (Some(json!(sum)), true)
+                match value.unwrap() {
+                    RuntimeValue::I32(result_length) => {
+                        let result_data = memory_ref.get(input_data_wasm_ptr, result_length as usize).unwrap();
+                        let (result, run_again) = serde_json::from_slice(result_data.as_slice()).unwrap();
+                        (result, run_again)
                     }
-                    _ => (None, true)
+                    _ =>  (None, true)
                 }
             }
             Err(err) => {
