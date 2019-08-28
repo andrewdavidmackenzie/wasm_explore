@@ -1,4 +1,4 @@
 [workspace]
-members = ["implementation", "main", "wrapper"]
+members = ["implementation", "main", "wrapper", "wasm_impl_derive"]
 default-members = ["main"]
 exclude = ["build"]

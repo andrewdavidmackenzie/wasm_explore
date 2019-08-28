@@ -11,4 +11,5 @@ path = "../add_function/src/add_function.rs"
 
 [dependencies]
 implementation = { path = "../implementation"}
+wasm_impl_derive = { path = "../wasm_impl_derive" }
 serde_json = "1.0"
