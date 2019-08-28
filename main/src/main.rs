@@ -23,13 +23,14 @@ fn run_wasm(filename: &str, inputs: &Vec<Vec<Value>>, expected: &Value) {
     let wasm_executor = loader::load(buffer);
 
     // Run the function
+    println!("Running function with input '{:?}'", inputs);
     let (result, run_again) = wasm_executor.run(inputs.clone());
 
     match result {
         Some(res) => {
             assert_eq!(expected.clone(), res);
             assert!(run_again);
-            println!("Ran successfully and result as expected");
+            println!("Ran successfully and result '{}' is as expected", res);
         },
         _ => assert!(false)
     }

@@ -63,4 +63,5 @@ Rust compiled to WASM
 ===========
 Loading wasm module from 'add_function/target/wasm32-unknown-unknown/debug/add_function.wasm'
 Running the exported function 'run_wasm'
+Ran successfully and result as expected
 ```
