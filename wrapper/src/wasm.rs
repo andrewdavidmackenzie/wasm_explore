@@ -21,7 +21,6 @@ impl WasmExecutor {
     }
 }
 
-
 /*
     Allocate memory for array of bytes inside the wasm module and copy the array of bytes into it
 */
@@ -33,10 +32,7 @@ fn send_byte_array(instance: &ModuleRef, memory: &MemoryRef, bytes: &[u8]) -> u3
 
     match result.unwrap().unwrap() {
         RuntimeValue::I32(pointer) => {
-            let len = bytes.len();
-            for i in 0..len {
-                memory.set_value((pointer + i as i32) as u32, bytes[i]).unwrap();
-            }
+            memory.set(pointer as u32, bytes).unwrap();
             pointer as u32
         }
         _ => 0 as u32
@@ -59,7 +55,6 @@ impl Implementation for WasmExecutor {
         let result = module_ref.invoke_export("run_wasm",
                                               &[RuntimeValue::I32(input_data_wasm_ptr as i32),
                                                   RuntimeValue::I32(input_data.len() as i32),], &mut NopExternals);
-
 
         match result {
             Ok(value) => {
