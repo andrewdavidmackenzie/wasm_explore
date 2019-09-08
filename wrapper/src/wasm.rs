@@ -50,8 +50,8 @@ impl Implementation for WasmExecutor {
 
         // Allocate a string for the input data inside wasm module
         let input_data_wasm_ptr = send_byte_array(&module_ref, &memory_ref, &input_data);
+        println!("wasm data sent via address: {}", input_data_wasm_ptr);
 
-        println!("Running the exported function 'run_wasm'");
         let result = module_ref.invoke_export("run_wasm",
                                               &[RuntimeValue::I32(input_data_wasm_ptr as i32),
                                                   RuntimeValue::I32(input_data.len() as i32),], &mut NopExternals);
